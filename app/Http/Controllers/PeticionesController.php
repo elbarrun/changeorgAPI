@@ -12,7 +12,8 @@ class PeticionesController extends Controller
 {
     public function index(Request $request)
     {
-
+        $peticiones = Peticione::all();
+        return $peticiones;
     }
     public function listMine(Request $request)
     {
