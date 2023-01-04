@@ -42,23 +42,33 @@ class PeticionesController extends Controller
                 'descripcion' => 'required',
                 'destinatario' => 'required',
                 'categoria_id' => 'required',
-                'image' => 'required',
+                'file' => 'required',
             ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 401);
+        }
+        $validator = Validator::make($request->all(),
+            [
+                'file' => 'required|mimes:png,jpg|max:4096',
+            ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()],
+                401);
+        }
+
         $input = $request->all();
-        $file=$request->file('image');
         $category = Category::findOrFail($input['categoria_id']);
-$user = Auth::user(); //asociarlo al usuario authenticado
+        $user = Auth::user(); //asociarlo al usuario authenticado
         $peticion = new Peticione($input);
-$peticion->user()->associate($user);
-        $peticion->categoria()->associate($category);
+        $peticion->user()->associate($user);
+        $peticion->category()->associate($category);
         $peticion->firmantes = 0;
         $peticion->estado = 'pendiente';
-        $peticion->image=$path;
         $peticion->save();
         return $peticion;
     }
 
-        public function firmar(Request $request, $id)
+    public function firmar(Request $request, $id)
     {
         try {
             $peticion = Peticione::findOrFail($id);
@@ -66,7 +76,8 @@ $peticion->user()->associate($user);
             $firmas = $peticion->firmas;
             foreach ($firmas as $firma) {
                 if ($firma->id == $user->id) {
-                    return response()->json(['message' => 'Ya has firmado esta petición'], 403);
+                    return response()->json(['message' => 'Ya has firmado esta
+petición'], 403);
                 }
             }
             $user_id = [$user->id];
@@ -74,10 +85,13 @@ $peticion->user()->associate($user);
             $peticion->firmantes = $peticion->firmantes + 1;
             $peticion->save();
         } catch (\Throwable$th) {
-            return response()->json(['message' => $th->getMessage()], 500);
+            return response()->json(['message' => 'La petición no se ha podido
+firmar'], 500);
         }
-        return response()->json(['message' => 'Peticion firmada satisfactioriamente', 'peticion' => $peticion], 201);
+        return response()->json(['message' => 'Peticion firmada
+satisfactioriamente', 'peticion' => $peticion], 201);
     }
+
 
     public function cambiarEstado(Request $request, $id)
     {
@@ -95,5 +109,9 @@ $peticion->user()->associate($user);
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => ['index', 'show']]);
+    }
+    function list(Request $request) {
+        $peticiones = Peticione::jsonPaginate();
+        return $peticiones;
     }
 }

@@ -64,6 +64,11 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+    public function firmas()
+    {
+        return $this->belongsToMany(Peticione::class, 'peticione_user');
+    }
+
 }
 
 
