@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Validator;
 
 class PeticionesController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => ['index', 'show', 'store']]);
+    }
+
     public function index(Request $request)
     {
         $peticiones = Peticione::all();
@@ -42,33 +48,33 @@ class PeticionesController extends Controller
                 'descripcion' => 'required',
                 'destinatario' => 'required',
                 'categoria_id' => 'required',
-                'file' => 'required',
+                //'file' => 'required',
             ]);
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], 401);
         }
-        $validator = Validator::make($request->all(),
+       /* $validator = Validator::make($request->all(),
             [
-                'file' => 'required|mimes:png,jpg|max:4096',
+                'file' => 'mimes:png,jpg|max:4096',
             ]);
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()],
-                401);
-        }
+                401);*/
+        //}
 
         $input = $request->all();
-        $category = Category::findOrFail($input['categoria_id']);
-        $user = Auth::user(); //asociarlo al usuario authenticado
+      //  $category = Category::findOrFail($input['categoria_id']);
+        //$user = Auth::user(); //asociarlo al usuario authenticado
         $peticion = new Peticione($input);
-        $peticion->user()->associate($user);
-        $peticion->category()->associate($category);
-        $peticion->firmantes = 0;
-        $peticion->estado = 'pendiente';
+        //$peticion->user()->associate($user);
+        //$peticion->category()->associate($category);
+        //$peticion->firmantes = 0;
+       // $peticion->estado = 'pendiente';
         $peticion->save();
         return $peticion;
     }
 
-    public function firmar(Request $request, $id)
+    /*public function firmar(Request $request, $id)
     {
         try {
             $peticion = Peticione::findOrFail($id);
@@ -90,7 +96,7 @@ firmar'], 500);
         }
         return response()->json(['message' => 'Peticion firmada
 satisfactioriamente', 'peticion' => $peticion], 201);
-    }
+    }*/
 
 
     public function cambiarEstado(Request $request, $id)
@@ -106,10 +112,7 @@ satisfactioriamente', 'peticion' => $peticion], 201);
         $peticion->delete();
         return $peticion;
     }
-    public function __construct()
-    {
-        $this->middleware('auth:api', ['except' => ['index', 'show']]);
-    }
+
     function list(Request $request) {
         $peticiones = Peticione::jsonPaginate();
         return $peticiones;

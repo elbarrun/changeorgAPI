@@ -9,7 +9,7 @@ class Peticione extends Model
 {
     use HasFactory;
     protected $fillable = ['titulo', 'descripcion', 'destinatario',
-        'firmantes', 'estado','file'];
+        'firmantes', 'estado'];
     public function user()
     {
         return $this->belongsTo(User::class);

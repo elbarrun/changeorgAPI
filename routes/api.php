@@ -22,7 +22,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/peticiones/listado', [PeticionesController::class, 'list']);
 Route::post('/peticiones/create', [PeticionesController::class, 'store']);
-Route::get('/peticiones/show/{id}', [PeticionesController::class, 'show']);
+Route::get( '/peticiones/show/{id}', [PeticionesController::class, 'show']);
 Route::put('/peticiones/update/{id}', [PeticionesController::class, 'update']);
 Route::delete('/peticiones/destroy/{id}', [PeticionesController::class, 'destroy']);
 Route::get('/peticiones/firmar/{id}', [PeticionesController::class, 'firmar']);
@@ -38,6 +38,6 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('register', 'register');
     Route::post('logout', 'logout');
     Route::post('refresh', 'refresh');
-    Route::get('me', 'me');
+    Route::get('user-profile', 'me');
 });
 
